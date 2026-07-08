@@ -31,6 +31,14 @@ Protótipo front-end do Sistema de Gestão Hospitalar e de Serviços de Saúde V
 
 Senha demo da tela inicial: `VidaPlus@2026`
 
+## Publicação
+
+O projeto está preparado para publicação no GitHub Pages via GitHub Actions.
+
+URL esperada da aplicação publicada:
+
+`https://elderdebertolis-gif.github.io/SGHSS-VidaPuls/`
+
 ## Observação
 
 O projeto foi validado com `tsc --noEmit` e `vite build` após os ajustes finais.
