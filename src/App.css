@@ -2229,6 +2229,11 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .content-grid--form-aside,
+  .content-grid--detail-aside {
+    grid-template-columns: 1fr;
+  }
+
   .sidebar {
     position: fixed;
     left: 0;
@@ -2324,8 +2329,30 @@ textarea {
     align-items: stretch;
   }
 
+  .topbar__heading {
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .topbar__heading--workspace {
+    gap: 0.85rem;
+  }
+
+  .topbar__menu-button {
+    flex: 0 0 auto;
+    align-self: flex-start;
+  }
+
   .topbar__controls {
     justify-content: flex-start;
+  }
+
+  .topbar__controls--workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
   }
 
   .topbar--workspace {
@@ -2339,17 +2366,43 @@ textarea {
 
   .page-shell {
     width: 100%;
+    overflow-x: clip;
   }
 
   .status-ribbon {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 0.2rem;
-    margin-inline: -0.1rem;
+    margin-inline: 0;
+    scroll-snap-type: x proximity;
   }
 
   .status-pill {
     flex: 0 0 auto;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  .search-field--compact,
+  .topbar__unit-filter {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .topbar__menu-group {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    align-self: flex-end;
+  }
+
+  .page-grid--management .section-intro__title,
+  .section-intro--compact .section-intro__title {
+    max-width: none;
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    line-height: 1.02;
   }
 
   .auth-hero__copy h1 {
