@@ -122,6 +122,7 @@ interface SectionIntroProps {
   title: string
   description: string
   actions?: ReactNode
+  className?: string
 }
 
 interface PanelProps {
@@ -331,9 +332,9 @@ function Panel({ children, className = '' }: PanelProps) {
   return <section className={['panel', className].filter(Boolean).join(' ')}>{children}</section>
 }
 
-function SectionIntro({ eyebrow, title, description, actions }: SectionIntroProps) {
+function SectionIntro({ eyebrow, title, description, actions, className = '' }: SectionIntroProps) {
   return (
-    <div className="section-intro">
+    <div className={['section-intro', className].filter(Boolean).join(' ')}>
       <div>
         <span className="section-intro__eyebrow">{eyebrow}</span>
         <h1 className="section-intro__title">{title}</h1>
@@ -578,7 +579,6 @@ function App() {
   const activeProfile = sessionProfile ?? loginForm.profile
   const activeMenu = profileMenus[activeProfile]
   const activeMeta = profileMeta[activeProfile]
-  const activeMenuItem = activeMenu.find((item) => item.key === currentView) ?? activeMenu[0]
   const isPatientSession = sessionProfile === 'patient'
   const isProfessionalSession = sessionProfile === 'professional'
   const isAdminSession = sessionProfile === 'admin'
@@ -693,6 +693,16 @@ function App() {
     (item) => item.status === 'Agendado' || item.status === 'Confirmado',
   ).length
   const primaryProfessionalUnit = agenda[0]?.unit ?? 'Equipe assistencial'
+  const workspaceContextTitle = isPatientSession
+    ? 'Portal do paciente'
+    : isProfessionalSession
+      ? 'Jornada assistencial'
+      : 'OperaÃ§Ã£o institucional'
+  const workspaceContextDescription = isPatientSession
+    ? 'Acompanhe consultas, exames, prescriÃ§Ãµes e privacidade com navegaÃ§Ã£o simples.'
+    : isProfessionalSession
+      ? 'Use agenda, prontuÃ¡rio, telemedicina e registros clÃ­nicos sem perder contexto.'
+      : 'Gerencie pacientes, unidades, leitos, auditoria e acessos em um sÃ³ ambiente.'
   const workspaceSearchPlaceholder = isPatientSession
     ? 'Pesquisar consultas, exames e prescrições...'
     : isProfessionalSession
@@ -2316,7 +2326,7 @@ function App() {
   function renderPatientView() {
     if (currentView === 'profile') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Cadastro"
             title="Dados do paciente"
@@ -2328,7 +2338,7 @@ function App() {
             }
           />
           <div className="content-grid content-grid--wide content-grid--form-aside">
-            <Panel>
+            <Panel className="panel--editor">
               <form className="form-grid" id="patient-form" onSubmit={handleSavePatientProfile}>
                 <label className="form-field"><span>Nome completo</span><input value={patientProfile.name} onChange={(event) => setPatientProfile((current) => ({ ...current, name: event.target.value }))} required /></label>
                 <label className="form-field"><span>CPF</span><input value={patientProfile.cpf} onChange={(event) => setPatientProfile((current) => ({ ...current, cpf: event.target.value }))} required /></label>
@@ -2356,7 +2366,7 @@ function App() {
 
     if (currentView === 'consultations') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro eyebrow="Consultas" title="Agendar, visualizar e cancelar consultas" description="Fluxo com especialidade, unidade, profissional, data, horário e comprovante visual." />
           <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
@@ -2382,9 +2392,9 @@ function App() {
 
     if (currentView === 'exams') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro eyebrow="Exames" title="Agendamento e orientações pré-exame" description="Escolha tipo de exame, unidade, data e horário com feedback visual imediato." />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>Novo exame</h2>
               <form className="form-grid" onSubmit={handleScheduleExam}>
@@ -2473,7 +2483,7 @@ function App() {
       return (
         <div className="page-grid">
           <SectionIntro eyebrow="Teleconsulta" title="Sala de espera e videochamada segura" description="Fluxo com check-in, status de conexão, prontuário online e avaliação do atendimento." />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel className="panel--accent">
               <div className="record-card__header"><div><h2>{nextTeleAppointment.specialty}</h2><p>{formatDate(nextTeleAppointment.date)} as {nextTeleAppointment.time} " {nextTeleAppointment.professional}</p></div><StatusBadge status={teleStage === 'live' ? 'Ao vivo' : teleStage === 'finished' ? 'Encerrada' : telePatientReady ? 'Paciente na sala' : 'Aguardando check-in'} /></div>
               <ul className="detail-list"><li><span>Conexão segura</span><strong>Canal protegido (simulado)</strong></li><li><span>Dados clínicos</span><strong>Acesso restrito ao profissional em atendimento</strong></li></ul>
@@ -3009,16 +3019,17 @@ function App() {
   function renderAdminView() {
     if (currentView === 'patients') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Gestão de pacientes"
             title="Cadastro, filtros e situação assistencial"
             description="Fluxo administrativo com criação, edição, visualização e inativação simulada."
+            className="section-intro--compact"
           />
           <div className="content-grid content-grid--wide content-grid--form-aside">
-            <Panel>
+            <Panel className="panel--editor">
               <h2>{editingPatientId ? 'Editar paciente' : 'Novo paciente'}</h2>
-              <form className="form-grid" onSubmit={handleCreateAdminPatient}>
+              <form className="form-grid form-grid--editor" onSubmit={handleCreateAdminPatient}>
                 <label className="form-field">
                   <span>Nome</span>
                   <input
@@ -3093,7 +3104,7 @@ function App() {
                 </div>
               </form>
             </Panel>
-            <Panel>
+            <Panel className="panel--table">
               <div className="table-wrapper">
                 <table className="data-table data-table--cards">
                   <thead>
@@ -3143,7 +3154,7 @@ function App() {
 
     if (currentView === 'professionals') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Gestão de profissionais"
             title="Escalas, unidades e níveis de acesso"
@@ -3152,7 +3163,7 @@ function App() {
           <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>{editingProfessionalId ? 'Editar profissional' : 'Novo profissional'}</h2>
-              <form className="form-grid" onSubmit={handleCreateProfessional}>
+              <form className="form-grid form-grid--editor" onSubmit={handleCreateProfessional}>
                 <label className="form-field">
                   <span>Nome</span>
                   <input
@@ -3222,7 +3233,7 @@ function App() {
                 </div>
               </form>
             </Panel>
-            <Panel>
+            <Panel className="panel--table">
               <div className="table-wrapper">
                 <table className="data-table data-table--cards">
                   <thead>
@@ -3272,16 +3283,16 @@ function App() {
 
     if (currentView === 'units') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Unidades"
             title="Hospitais, clínicas, laboratório e home care"
             description="Cadastro e acompanhamento das unidades com status, ocupação e especialidades."
           />
           <div className="content-grid content-grid--wide content-grid--form-aside">
-            <Panel>
+            <Panel className="panel--editor">
               <h2>{editingUnitId ? 'Editar unidade' : 'Nova unidade'}</h2>
-              <form className="form-grid" onSubmit={handleCreateUnit}>
+              <form className="form-grid form-grid--editor" onSubmit={handleCreateUnit}>
                 <label className="form-field">
                   <span>Nome</span>
                   <input
@@ -3364,7 +3375,7 @@ function App() {
                 </div>
               </form>
             </Panel>
-            <Panel>
+            <Panel className="panel--table">
               <div className="table-wrapper">
                 <table className="data-table data-table--cards">
                   <thead>
@@ -3439,16 +3450,16 @@ function App() {
 
     if (currentView === 'admissions') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Internações"
             title="Fluxo de entrada, transferencia e alta"
             description="Busca de paciente, escolha de unidade, ala e leito com atualização do status assistencial."
           />
-          <div className="content-grid content-grid--wide">
-            <Panel>
+          <div className="content-grid content-grid--wide content-grid--form-aside">
+            <Panel className="panel--editor">
               <h2>Nova internação</h2>
-              <form className="form-grid" onSubmit={handleAdmissionSubmit}>
+              <form className="form-grid form-grid--editor" onSubmit={handleAdmissionSubmit}>
                 <label className="form-field">
                   <span>Paciente</span>
                   <select
@@ -3544,10 +3555,10 @@ function App() {
                 </div>
               </form>
             </Panel>
-            <Panel>
+            <Panel className="panel--editor panel--editor-secondary">
               <h2>{admissionTransferId ? 'Transferência interna' : 'Movimentações'}</h2>
               {admissionTransferId ? (
-                <form className="form-grid" onSubmit={handleTransferAdmission}>
+                <form className="form-grid form-grid--editor" onSubmit={handleTransferAdmission}>
                   <label className="form-field">
                     <span>Nova unidade</span>
                     <select
@@ -3693,14 +3704,14 @@ function App() {
 
     if (currentView === 'security') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Segurança e auditoria"
             title="Logs críticos e histórico de acessos"
             description="Rastreabilidade das principais ações, com filtros por usuário, perfil, data, ação e módulo."
           />
           <div className="content-grid content-grid--wide content-grid--detail-aside">
-            <Panel>
+            <Panel className="panel--table">
               <div className="toolbar toolbar--dense">
                 <input
                   value={auditUserFilter}
@@ -3837,7 +3848,7 @@ function App() {
 
     if (currentView === 'permissions') {
       return (
-        <div className="page-grid">
+        <div className="page-grid page-grid--management">
           <SectionIntro
             eyebrow="Perfis de acesso"
             title="Usuários de acesso e permissões por módulo"
@@ -3863,7 +3874,7 @@ function App() {
               tone="warning"
             />
           </div>
-          <Panel>
+          <Panel className="panel--table">
             <div className="toolbar toolbar--dense">
               <select
                 value={permissionProfileFilter}
@@ -3932,7 +3943,7 @@ function App() {
           <div className="content-grid content-grid--wide content-grid--form-aside permissions-layout">
             {selectedPermissionUser ? (
               <>
-                <Panel>
+                <Panel className="panel--editor">
                   <div className="record-card__header">
                     <div>
                       <h2>Cadastro de acesso</h2>
@@ -3942,7 +3953,7 @@ function App() {
                     </div>
                     <StatusBadge status={selectedPermissionUser.status} />
                   </div>
-                  <form className="form-grid" onSubmit={handleSavePermissionAccessProfile}>
+                  <form className="form-grid form-grid--editor" onSubmit={handleSavePermissionAccessProfile}>
                     <label className="form-field">
                       <span>Nome</span>
                       <input
@@ -4009,7 +4020,7 @@ function App() {
                     </div>
                   </form>
                 </Panel>
-                <Panel className="panel--accent">
+                <Panel className="panel--accent panel--table">
                   <div className="record-card__header">
                     <div>
                       <h2>Permissões por módulo</h2>
@@ -4111,8 +4122,8 @@ function App() {
                 </button>
                 <div className="topbar__identity">
                   <span className="section-intro__eyebrow">{activeMeta.label}</span>
-                  <strong>{activeMenuItem.label}</strong>
-                  <p>{activeMenuItem.description}</p>
+                  <strong>{workspaceContextTitle}</strong>
+                  <p>{workspaceContextDescription}</p>
                 </div>
               </div>
               <div className="topbar__controls topbar__controls--workspace">
