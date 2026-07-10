@@ -688,11 +688,6 @@ function App() {
   const nextTeleAppointment =
     appointments.find((item) => item.modality === 'Telemedicina' && item.status !== 'Cancelado') ??
     appointments[1]
-  const professionalTelemedicineCount = agenda.filter((item) => item.type === 'Telemedicina').length
-  const professionalPendingAgendaCount = agenda.filter(
-    (item) => item.status === 'Agendado' || item.status === 'Confirmado',
-  ).length
-  const primaryProfessionalUnit = agenda[0]?.unit ?? 'Equipe assistencial'
   const workspaceContextTitle = isPatientSession
     ? 'Portal do paciente'
     : isProfessionalSession
@@ -708,25 +703,6 @@ function App() {
     : isProfessionalSession
       ? 'Pesquisar agenda, pacientes e prontuários...'
       : 'Pesquisar pacientes, leitos, unidades e logs...'
-  const contextualStatusItems = isPatientSession
-    ? [
-        `${upcomingAppointments.length} consulta(s) programada(s)`,
-        `${pendingExams} exame(s) pendente(s)`,
-        `${unreadNotifications} notificações não lidas`,
-      ]
-    : isProfessionalSession
-      ? [
-          `Agenda total: ${agenda.length}`,
-          `Pendencias de agenda: ${professionalPendingAgendaCount}`,
-          `Teleconsultas previstas: ${professionalTelemedicineCount}`,
-          `Unidade principal: ${primaryProfessionalUnit}`,
-        ]
-      : [
-          `Disponibilidade: ${availabilitySnapshot.availability}`,
-          `Último backup: ${availabilitySnapshot.backup}`,
-          availabilitySnapshot.integrity,
-        ]
-
   const filteredAppointments = appointments.filter(
     (item) =>
       (consultationStatusFilter === 'Todas' || item.status === consultationStatusFilter) &&
@@ -4164,7 +4140,7 @@ function App() {
                     type="button"
                     aria-haspopup="menu"
                     aria-expanded={quickMenuOpen}
-                    aria-label={`Abrir atalhos do perfil ${activeMeta.label}`}
+                    aria-label={`Abrir menu do usuário ${sessionUserName(sessionProfile)}`}
                     onClick={() => setQuickMenuOpen((current) => !current)}
                   >
                     <span className="sr-only">{activeMeta.label}</span>
@@ -4178,8 +4154,8 @@ function App() {
                     <div className="topbar__dropdown" role="menu" aria-label={`Atalhos do perfil ${activeMeta.label}`}>
                       <div className="topbar__dropdown-header">
                         <span className="section-intro__eyebrow">{activeMeta.label}</span>
-                        <strong>{activeQuickMenuConfig.title}</strong>
-                        <p>{activeQuickMenuConfig.description}</p>
+                        <strong>{sessionUserName(sessionProfile)}</strong>
+                        <p>{activeQuickMenuConfig.title}</p>
                       </div>
                       <div className="topbar__dropdown-list">
                         {quickMenuItems.map((item) => (
@@ -4209,14 +4185,6 @@ function App() {
                 </div>
               </div>
             </header>
-            <div className="status-ribbon">
-              <span className="status-pill status-pill--solid">{sessionUserName(sessionProfile)}</span>
-              {contextualStatusItems.map((item) => (
-                <span key={item} className="status-pill">
-                  {item}
-                </span>
-              ))}
-            </div>
             <div className="page-shell">{renderWorkspaceContent()}</div>
           </main>
         </div>
